@@ -1,0 +1,12 @@
+streamlit
+sqlalchemy
+psycopg2-binary
+pandas
+reportlab
+python-dotenv
+pillow
+streamlit-option-menu
+fastapi
+pydantic
+matplotlib
+plotly
