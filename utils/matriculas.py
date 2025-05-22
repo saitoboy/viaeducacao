@@ -2,6 +2,11 @@ import streamlit as st
 from datetime import date
 import requests
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 def format_cpf(cpf):
     digits = ''.join(filter(str.isdigit, cpf))[:11]
@@ -141,7 +146,7 @@ def aba_matriculas(get_options_api):
                 "observacao": observacao
             }
             try:
-                response = requests.post("http://localhost:8000/carteirinha/", json=payload)
+                response = requests.post(f"{API_URL}/carteirinha/", json=payload)
                 if response.status_code == 200:
                     st.success("Dados salvos com sucesso!")
                 else:

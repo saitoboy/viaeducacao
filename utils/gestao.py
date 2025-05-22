@@ -1,6 +1,11 @@
+import os
+from dotenv import load_dotenv
 import streamlit as st
 import pandas as pd
 import requests
+
+load_dotenv()
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 def aba_gestao():
     st.title("🛠️ Gestão de Dados Cadastrais")
@@ -11,7 +16,7 @@ def aba_gestao():
 
     def get_existing(endpoint):
         try:
-            resp = requests.get(f"http://localhost:8000/{endpoint}/")
+            resp = requests.get(f"{API_URL}/{endpoint}/")
             if resp.status_code == 200:
                 return resp.json()
             else:
@@ -23,7 +28,7 @@ def aba_gestao():
         nome = st.text_input("Nome do Distrito")
         if st.button("Adicionar Distrito"):
             if nome.strip():
-                resp = requests.post("http://localhost:8000/distritos/", json={"nome": nome})
+                resp = requests.post(f"{API_URL}/distritos/", json={"nome": nome})
                 if resp.status_code == 200:
                     st.success("Distrito adicionado com sucesso!")
                 else:
@@ -40,7 +45,7 @@ def aba_gestao():
                 confirma = st.checkbox(f"Confirmar exclusão de '{selected}'", key="confirma_excluir_distrito")
                 if confirma and st.button(f"Excluir '{selected}'", key="btn_excluir_distrito"):
                     try:
-                        resp = requests.delete(f"http://localhost:8000/distritos/{selected}")
+                        resp = requests.delete(f"{API_URL}/distritos/{selected}")
                         if resp.status_code == 200:
                             st.success("Distrito excluído com sucesso!")
                             st.rerun()
@@ -55,7 +60,7 @@ def aba_gestao():
         nome = st.text_input("Nome do Transportador")
         if st.button("Adicionar Transportador"):
             if nome.strip():
-                resp = requests.post("http://localhost:8000/transportadores/", json={"nome": nome})
+                resp = requests.post(f"{API_URL}/transportadores/", json={"nome": nome})
                 if resp.status_code == 200:
                     st.success("Transportador adicionado com sucesso!")
                 else:
@@ -72,7 +77,7 @@ def aba_gestao():
                 confirma = st.checkbox(f"Confirmar exclusão de '{selected}'", key="confirma_excluir_transportador")
                 if confirma and st.button(f"Excluir '{selected}'", key="btn_excluir_transportador"):
                     try:
-                        resp = requests.delete(f"http://localhost:8000/transportadores/{selected}")
+                        resp = requests.delete(f"{API_URL}/transportadores/{selected}")
                         if resp.status_code == 200:
                             st.success("Transportador excluído com sucesso!")
                             st.rerun()
@@ -87,7 +92,7 @@ def aba_gestao():
         nome = st.text_input("Nome da Instituição de Ensino")
         if st.button("Adicionar Instituição"):
             if nome.strip():
-                resp = requests.post("http://localhost:8000/instituicoes/", json={"nome": nome})
+                resp = requests.post(f"{API_URL}/instituicoes/", json={"nome": nome})
                 if resp.status_code == 200:
                     st.success("Instituição adicionada com sucesso!")
                 else:
@@ -104,7 +109,7 @@ def aba_gestao():
                 confirma = st.checkbox(f"Confirmar exclusão de '{selected}'", key="confirma_excluir_instituicao")
                 if confirma and st.button(f"Excluir '{selected}'", key="btn_excluir_instituicao"):
                     try:
-                        resp = requests.delete(f"http://localhost:8000/instituicoes/{selected}")
+                        resp = requests.delete(f"{API_URL}/instituicoes/{selected}")
                         if resp.status_code == 200:
                             st.success("Instituição excluída com sucesso!")
                             st.rerun()
@@ -119,7 +124,7 @@ def aba_gestao():
         nome = st.text_input("Nome do Curso")
         if st.button("Adicionar Curso"):
             if nome.strip():
-                resp = requests.post("http://localhost:8000/cursos/", json={"nome": nome})
+                resp = requests.post(f"{API_URL}/cursos/", json={"nome": nome})
                 if resp.status_code == 200:
                     st.success("Curso adicionado com sucesso!")
                 else:
@@ -136,7 +141,7 @@ def aba_gestao():
                 confirma = st.checkbox(f"Confirmar exclusão de '{selected}'", key="confirma_excluir_curso")
                 if confirma and st.button(f"Excluir '{selected}'", key="btn_excluir_curso"):
                     try:
-                        resp = requests.delete(f"http://localhost:8000/cursos/{selected}")
+                        resp = requests.delete(f"{API_URL}/cursos/{selected}")
                         if resp.status_code == 200:
                             st.success("Curso excluído com sucesso!")
                             st.rerun()

@@ -3,6 +3,11 @@ import pandas as pd
 import requests
 import plotly.express as px
 import plotly.graph_objects as go
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 def aba_relatorios():
     st.title("📊 Relatórios")
@@ -11,10 +16,10 @@ def aba_relatorios():
     distritos_data = []
     transportadores_data = []
     try:
-        distritos_resp = requests.get("http://localhost:8000/relatorio/distritos/")
+        distritos_resp = requests.get(f"{API_URL}/relatorio/distritos/")
         if distritos_resp.status_code == 200:
             distritos_data = distritos_resp.json()
-        transportadores_resp = requests.get("http://localhost:8000/relatorio/transportadores/")
+        transportadores_resp = requests.get(f"{API_URL}/relatorio/transportadores/")
         if transportadores_resp.status_code == 200:
             transportadores_data = transportadores_resp.json()
     except Exception as e:
@@ -50,7 +55,7 @@ def aba_relatorios():
     # Alunos por Dia de Utilização
     dias_data = []
     try:
-        dias_resp = requests.get("http://localhost:8000/relatorio/dias/")
+        dias_resp = requests.get(f"{API_URL}/relatorio/dias/")
         if dias_resp.status_code == 200:
             dias_data = dias_resp.json()
     except Exception as e:
@@ -71,7 +76,7 @@ def aba_relatorios():
     # Heatmap: Alunos por Dia e Distrito
     dias_distritos_data = []
     try:
-        dias_distritos_resp = requests.get("http://localhost:8000/relatorio/dias_distritos/")
+        dias_distritos_resp = requests.get(f"{API_URL}/relatorio/dias_distritos/")
         if dias_distritos_resp.status_code == 200:
             dias_distritos_data = dias_distritos_resp.json()
     except Exception as e:

@@ -5,6 +5,10 @@ import requests
 import os
 from io import BytesIO
 import unicodedata
+from dotenv import load_dotenv
+
+load_dotenv()
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 def slugify_nome(nome):
     nome = unicodedata.normalize('NFKD', nome).encode('ASCII', 'ignore').decode('ASCII')
@@ -15,7 +19,7 @@ def aba_carteirinha():
     st.title("🪪 Gerar Carteirinha")
     # Buscar alunos da API
     try:
-        response = requests.get("http://localhost:8000/alunos/")
+        response = requests.get(f"{API_URL}/alunos/")
         if response.status_code == 200:
             alunos = response.json()
         else:
@@ -35,7 +39,7 @@ def aba_carteirinha():
         carteirinha_id = None
         # Buscar carteirinha_id do aluno
         try:
-            resp = requests.get(f"http://localhost:8000/carteirinha/por_aluno/{aluno_id}")
+            resp = requests.get(f"{API_URL}/carteirinha/por_aluno/{aluno_id}")
             if resp.status_code == 200:
                 carteirinha_id = resp.json().get("carteirinha_id")
             else:
