@@ -11,6 +11,7 @@ from utils.alunos import aba_alunos
 from utils.matriculas import aba_matriculas
 from utils.relatorios import aba_relatorios
 from utils.gestao import aba_gestao
+from utils.carteirinha import aba_carteirinha
 
 load_dotenv()  # Carrega as variáveis do .env
 
@@ -54,8 +55,8 @@ st.markdown("""
 with st.sidebar:
     escolha = option_menu(
         "ViaEducação",
-        options=["Matrículas", "Relatórios", "Alunos", "Gestão"],
-        icons=["file-earmark-text", "bar-chart", "people", "gear"],
+        options=["Matrículas", "Relatórios", "Alunos", "Gestão", "Carteirinha"],
+        icons=["file-earmark-text", "bar-chart", "people", "gear", "credit-card-2-front-fill"],
         menu_icon="cast",
         default_index=0,
         styles={
@@ -87,7 +88,7 @@ with st.sidebar:
         }
     )
     st.markdown("---")
-    st.sidebar.caption("Desenvolvido por Guilherme Saito")
+    st.sidebar.caption("Desenvolvido por Projetos e Inovação")
 
 if escolha == "Matrículas":
     aba_matriculas(get_options_api)
@@ -97,3 +98,5 @@ elif escolha == "Relatórios":
     aba_relatorios()
 elif escolha == "Gestão":
     aba_gestao()
+elif escolha == "Carteirinha":
+    aba_carteirinha()

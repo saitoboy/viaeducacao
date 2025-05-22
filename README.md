@@ -27,6 +27,8 @@ Sistema completo para cadastro, gestão e geração de carteirinhas de transport
 3. **Instale as dependências:**
    ```
    pip install -r requirements.txt
+
+   --proxy="http://guilherme.saito:890484gS@10.10.30.9:3128"
    ```
 
 4. **Execute o backend (FastAPI):**

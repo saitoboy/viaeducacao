@@ -11,6 +11,7 @@ from backend.routes.gestao import router as gestao_router
 from backend.routes.matriculas import router as matriculas_router
 from backend.routes.alunos import router as alunos_router
 from backend.routes.relatorios import router as relatorios_router
+from backend.routes.carteirinha import router as carteirinha_router
 
 load_dotenv()
 
@@ -29,6 +30,7 @@ app.include_router(gestao_router)
 app.include_router(matriculas_router)
 app.include_router(alunos_router)
 app.include_router(relatorios_router)
+app.include_router(carteirinha_router)
 
 class CarteirinhaIn(BaseModel):
     nome: str
