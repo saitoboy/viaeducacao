@@ -1,9 +1,16 @@
+#uvicorn backend.main:app --reload
+
 from fastapi import FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import psycopg2
 import os
 from dotenv import load_dotenv
+
+from backend.db import get_connection
+from backend.routes.gestao import router as gestao_router
+from backend.routes.matriculas import router as matriculas_router
+from backend.routes.alunos import router as alunos_router
+from backend.routes.relatorios import router as relatorios_router
 
 load_dotenv()
 
@@ -18,13 +25,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_connection():
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST"),
-        database=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS")
-    )
+app.include_router(gestao_router)
+app.include_router(matriculas_router)
+app.include_router(alunos_router)
+app.include_router(relatorios_router)
 
 class CarteirinhaIn(BaseModel):
     nome: str
