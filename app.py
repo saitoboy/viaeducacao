@@ -55,8 +55,8 @@ st.markdown("""
 with st.sidebar:
     escolha = option_menu(
         "ViaEducação",
-        options=["Matrículas", "Relatórios", "Alunos", "Gestão", "Carteirinha"],
-        icons=["file-earmark-text", "bar-chart", "people", "gear", "credit-card-2-front-fill"],
+        options=["Matrículas", "Carteirinha", "Alunos", "Relatórios", "Gestão"],
+        icons=["file-earmark-text", "credit-card-2-front-fill", "people", "bar-chart", "gear"],
         menu_icon="cast",
         default_index=0,
         styles={

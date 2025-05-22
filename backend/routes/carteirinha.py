@@ -51,3 +51,47 @@ def get_carteirinha_id_por_aluno(aluno_id: int):
     finally:
         cur.close()
         conn.close()
+
+@router.put("/carteirinha/{carteirinha_id}")
+def update_carteirinha(carteirinha_id: int, dados: dict):
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        # Buscar ids das tabelas relacionadas
+        cur.execute("SELECT distrito_id FROM distritos WHERE nome=%s", (dados.get("distrito"),))
+        distrito_id = cur.fetchone()[0]
+        cur.execute("SELECT transportador_id FROM transportadores WHERE nome=%s", (dados.get("transportador"),))
+        transportador_id = cur.fetchone()[0]
+        cur.execute("SELECT instituicao_id FROM instituicoes WHERE nome=%s", (dados.get("instituicao"),))
+        instituicao_id = cur.fetchone()[0]
+        cur.execute("SELECT curso_id FROM cursos WHERE nome=%s", (dados.get("curso"),))
+        curso_id = cur.fetchone()[0]
+        cur.execute("""
+            UPDATE carteirinhas SET
+                distrito_id=%s,
+                transportador_id=%s,
+                instituicao_id=%s,
+                curso_id=%s,
+                periodo=%s,
+                dias_utilizacao=%s,
+                data_validade=%s,
+                observacao=%s
+            WHERE carteirinha_id=%s
+        """, (
+            distrito_id,
+            transportador_id,
+            instituicao_id,
+            curso_id,
+            dados.get("periodo"),
+            ','.join(dados.get("dias", [])),
+            dados.get("data_validade"),
+            dados.get("observacao"),
+            carteirinha_id
+        ))
+        conn.commit()
+        return {"status": "ok"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        cur.close()
+        conn.close()

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+from datetime import date, datetime
 
 def format_cpf(cpf):
     digits = ''.join(filter(str.isdigit, cpf))[:11]
@@ -23,6 +24,22 @@ def format_telefone(telefone):
         return f"({digits[:2]}) {digits[2:7]}-{digits[7:]}"
     else:
         return f"({digits[:2]}) {digits[2:7]}-{digits[7:11]}"
+
+def parse_data(data_str):
+    try:
+        return datetime.strptime(data_str, "%Y-%m-%d").date()
+    except Exception:
+        return date.today()
+
+def get_options_api(endpoint):
+    try:
+        response = requests.get(f"http://localhost:8000/{endpoint}/")
+        if response.status_code == 200:
+            return ["Selecione..."] + response.json()
+        else:
+            return ["Selecione..."]
+    except Exception:
+        return ["Selecione..."]
 
 def aba_alunos():
     st.title("👨‍🎓 Alunos")
@@ -61,41 +78,97 @@ def aba_alunos():
                     if 'confirma_excluir_id' not in st.session_state:
                         st.session_state['confirma_excluir_id'] = None
                     with st.form(key="edit_aluno_form"):
-                        novo_nome = st.text_input("Nome", value=aluno['nome'])
-                        novo_email = st.text_input("E-mail", value=aluno['email'])
-                        # CPF: só aceita dígitos, formata apenas ao salvar
-                        cpf_raw = st.text_input("CPF", value=''.join(filter(str.isdigit, aluno['cpf'])), max_chars=11, key="cpf_edit", help="Apenas números")
-                        cpf_raw = ''.join(filter(str.isdigit, cpf_raw))[:11]
-                        novo_cpf = format_cpf(cpf_raw)
-                        novo_data_nasc = st.text_input("Data de nascimento", value=aluno.get('data_nascimento', ''))
-                        # RG: aceita até 11 caracteres (letras e números), remove espaços extras
-                        novo_rg = st.text_input("RG", value=aluno.get('rg', ''), max_chars=11, key="rg_edit", help="Máx. 11 caracteres (ex: 1234567, 12345678, 123456789, RGM12345678)")
-                        novo_rg = novo_rg.strip().replace(" ", "")[:11]
-                        # Telefone: só aceita dígitos, formata apenas ao salvar
-                        tel_raw = st.text_input("Telefone", value=''.join(filter(str.isdigit, aluno.get('telefone', ''))), max_chars=11, key="tel_edit", help="Apenas números")
-                        tel_raw = ''.join(filter(str.isdigit, tel_raw))[:11]
-                        novo_telefone = format_telefone(tel_raw)
                         col1, col2 = st.columns(2)
                         with col1:
-                            atualizar = st.form_submit_button("Atualizar")
+                            novo_nome = st.text_input("Nome do aluno", value=aluno['nome'])
+                            novo_email = st.text_input("E-mail", value=aluno['email'])
+                            cpf_raw = st.text_input("CPF", value=''.join(filter(str.isdigit, aluno['cpf'])), max_chars=11, key="cpf_edit", help="Apenas números")
+                            cpf_raw = ''.join(filter(str.isdigit, cpf_raw))[:11]
+                            novo_cpf = format_cpf(cpf_raw)
+                            novo_data_nasc = st.date_input(
+                                "Data de nascimento",
+                                value=parse_data(aluno.get('data_nascimento', '')),
+                                min_value=date(1900, 1, 1),
+                                max_value=date.today()
+                            )
+                            novo_rg = st.text_input("RG", value=aluno.get('rg', ''), max_chars=11, key="rg_edit", help="Máx. 11 caracteres (ex: 1234567, 12345678, 123456789, RGM12345678)")
+                            novo_rg = novo_rg.strip().replace(" ", "")[:11]
+                            tel_raw = st.text_input("Telefone", value=''.join(filter(str.isdigit, aluno.get('telefone', ''))), max_chars=11, key="tel_edit", help="Apenas números")
+                            tel_raw = ''.join(filter(str.isdigit, tel_raw))[:11]
+                            novo_telefone = format_telefone(tel_raw)
                         with col2:
+                            distritos = get_options_api("distritos")
+                            transportadores = get_options_api("transportadores")
+                            instituicoes = get_options_api("instituicoes")
+                            cursos = get_options_api("cursos")
+                            periodos = [
+                                "Selecione...",
+                                "1º PERÍODO/SEMESTRE",
+                                "2º PERÍODO/SEMESTRE",
+                                "3º PERÍODO/SEMESTRE",
+                                "4º PERÍODO/SEMESTRE",
+                                "5º PERÍODO/SEMESTRE",
+                                "6º PERÍODO/SEMESTRE",
+                                "7º PERÍODO/SEMESTRE",
+                                "8º PERÍODO/SEMESTRE",
+                                "9º PERÍODO/SEMESTRE",
+                                "10º PERÍODO/SEMESTRE"
+                            ]
+                            dias_opcoes = ["Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Todos os dias"]
+                            novo_distrito = st.selectbox("Distrito/Localidade", distritos, index=distritos.index(aluno.get('distrito')) if aluno.get('distrito') in distritos else 0)
+                            novo_transportador = st.selectbox("Transportador", transportadores, index=transportadores.index(aluno.get('transportador')) if aluno.get('transportador') in transportadores else 0)
+                            novo_instituicao = st.selectbox("Instituição de ensino", instituicoes, index=instituicoes.index(aluno.get('instituicao')) if aluno.get('instituicao') in instituicoes else 0)
+                            novo_curso = st.selectbox("Curso", cursos, index=cursos.index(aluno.get('curso')) if aluno.get('curso') in cursos else 0)
+                            novo_periodo = st.selectbox("Período/Semestre", periodos, index=periodos.index(aluno.get('periodo')) if aluno.get('periodo') in periodos else 0)
+                            dias_valor = aluno.get('dias', [])
+                            if isinstance(dias_valor, str):
+                                dias_valor = [d.strip() for d in dias_valor.split(',') if d.strip()]
+                            novo_dias = st.multiselect("🗓️ Dias de utilização", dias_opcoes, default=dias_valor)
+                            novo_data_validade = st.date_input(
+                                "Data de validade",
+                                value=parse_data(aluno.get('data_validade', '')),
+                                min_value=date(1900, 1, 1),
+                                max_value=date(2100, 12, 31)
+                            )
+                            novo_observacao = st.text_input("Observação", value=aluno.get('observacao', ''))
+                        col3, col4 = st.columns(2)
+                        with col3:
+                            atualizar = st.form_submit_button("Atualizar")
+                        with col4:
                             deletar = st.form_submit_button("Excluir", type="secondary")
                     if atualizar:
-                        payload = {
+                        # Atualiza dados do aluno
+                        payload_aluno = {
                             "nome": novo_nome,
                             "email": novo_email,
                             "cpf": novo_cpf,
-                            "data_nascimento": novo_data_nasc,
+                            "data_nascimento": str(novo_data_nasc),
                             "rg": novo_rg,
                             "telefone": novo_telefone
                         }
                         try:
-                            resp = requests.put(f"http://localhost:8000/alunos/{aluno['id']}", json=payload)
-                            if resp.status_code == 200:
+                            resp_aluno = requests.put(f"http://localhost:8000/alunos/{aluno['id']}", json=payload_aluno)
+                            # Atualiza dados da carteirinha
+                            # Buscar carteirinha_id
+                            resp_carteirinha_id = requests.get(f"http://localhost:8000/carteirinha/por_aluno/{aluno['id']}")
+                            if resp_carteirinha_id.status_code == 200:
+                                carteirinha_id = resp_carteirinha_id.json().get("carteirinha_id")
+                                payload_carteirinha = {
+                                    "distrito": novo_distrito,
+                                    "transportador": novo_transportador,
+                                    "instituicao": novo_instituicao,
+                                    "curso": novo_curso,
+                                    "periodo": novo_periodo,
+                                    "dias": novo_dias,
+                                    "data_validade": str(novo_data_validade),
+                                    "observacao": novo_observacao
+                                }
+                                requests.put(f"http://localhost:8000/carteirinha/{carteirinha_id}", json=payload_carteirinha)
+                            if resp_aluno.status_code == 200:
                                 st.success("Aluno atualizado com sucesso!", icon="✅")
                                 st.rerun()
                             else:
-                                st.error(f"Erro ao atualizar: {resp.text}")
+                                st.error(f"Erro ao atualizar: {resp_aluno.text}")
                         except Exception as e:
                             st.error(f"Erro ao conectar com a API: {e}")
                     # Confirmação de exclusão sem modal
