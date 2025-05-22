@@ -124,6 +124,12 @@ def aba_alunos():
                             if isinstance(dias_valor, str):
                                 dias_valor = [d.strip() for d in dias_valor.split(',') if d.strip()]
                             novo_dias = st.multiselect("🗓️ Dias de utilização", dias_opcoes, default=dias_valor)
+                            # Lógica: se marcar todos os dias da semana, vira 'Todos os dias'
+                            dias_semana = dias_opcoes[:-1]
+                            if set(dias_semana).issubset(set(novo_dias)):
+                                novo_dias = ["Todos os dias"]
+                            elif "Todos os dias" in novo_dias and len(novo_dias) > 1:
+                                novo_dias = ["Todos os dias"]
                             novo_data_validade = st.date_input(
                                 "Data de validade",
                                 value=parse_data(aluno.get('data_validade', '')),

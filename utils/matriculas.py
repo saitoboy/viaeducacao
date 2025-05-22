@@ -98,10 +98,19 @@ def aba_matriculas(get_options_api):
         ]
     )
 
+    dias_opcoes = [
+        "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Todos os dias"
+    ]
     dias = st.multiselect(
         "🗓️ Dias de utilização",
-        ["Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Todos os dias"]
+        dias_opcoes
     )
+    # Lógica: se marcar todos os dias da semana, vira 'Todos os dias'
+    dias_semana = dias_opcoes[:-1]
+    if set(dias_semana).issubset(set(dias)):
+        dias = ["Todos os dias"]
+    elif "Todos os dias" in dias and len(dias) > 1:
+        dias = ["Todos os dias"]
 
     # --- INSTITUIÇÃO DE ENSINO E INFORMAÇÕES DO CURSO (parte inferior) ---
     st.markdown("#### 📅 Validade e Observação")
