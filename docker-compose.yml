@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: seu_usuario
+      POSTGRES_PASSWORD: sua_senha
+      POSTGRES_DB: viaeducacao
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      - API_URL=http://localhost:8000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
+      - DB_NAME=viaeducacao
+    ports:
+      - "8501:8501"
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ./static/fotos:/app/static/fotos
+
+volumes:
+  pgdata:
