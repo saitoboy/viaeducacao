@@ -2,11 +2,6 @@ import streamlit as st
 import pandas as pd
 import requests
 from datetime import date, datetime
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 def format_cpf(cpf):
     digits = ''.join(filter(str.isdigit, cpf))[:11]
@@ -38,7 +33,7 @@ def parse_data(data_str):
 
 def get_options_api(endpoint):
     try:
-        response = requests.get(f"{API_URL}/{endpoint}/")
+        response = requests.get(f"http://localhost:8000/{endpoint}/")
         if response.status_code == 200:
             return ["Selecione..."] + response.json()
         else:
@@ -49,7 +44,7 @@ def get_options_api(endpoint):
 def aba_alunos():
     st.title("👨‍🎓 Alunos")
     try:
-        response = requests.get(f"{API_URL}/alunos/")
+        response = requests.get("http://localhost:8000/alunos/")
         if response.status_code == 200:
             alunos = response.json()
             if alunos:
@@ -158,10 +153,10 @@ def aba_alunos():
                             "telefone": novo_telefone
                         }
                         try:
-                            resp_aluno = requests.put(f"{API_URL}/alunos/{aluno['id']}", json=payload_aluno)
+                            resp_aluno = requests.put(f"http://localhost:8000/alunos/{aluno['id']}", json=payload_aluno)
                             # Atualiza dados da carteirinha
                             # Buscar carteirinha_id
-                            resp_carteirinha_id = requests.get(f"{API_URL}/carteirinha/por_aluno/{aluno['id']}")
+                            resp_carteirinha_id = requests.get(f"http://localhost:8000/carteirinha/por_aluno/{aluno['id']}")
                             if resp_carteirinha_id.status_code == 200:
                                 carteirinha_id = resp_carteirinha_id.json().get("carteirinha_id")
                                 payload_carteirinha = {
@@ -174,7 +169,7 @@ def aba_alunos():
                                     "data_validade": str(novo_data_validade),
                                     "observacao": novo_observacao
                                 }
-                                requests.put(f"{API_URL}/carteirinha/{carteirinha_id}", json=payload_carteirinha)
+                                requests.put(f"http://localhost:8000/carteirinha/{carteirinha_id}", json=payload_carteirinha)
                             if resp_aluno.status_code == 200:
                                 st.success("Aluno atualizado com sucesso!", icon="✅")
                                 st.rerun()
@@ -189,7 +184,7 @@ def aba_alunos():
                         confirma = st.checkbox(f"Confirmar exclusão de {aluno['nome']} ({aluno['cpf']})", key=f"confirma_excluir_{aluno['id']}")
                         if confirma:
                             try:
-                                resp = requests.delete(f"{API_URL}/alunos/{aluno['id']}")
+                                resp = requests.delete(f"http://localhost:8000/alunos/{aluno['id']}")
                                 if resp.status_code == 200:
                                     st.success("Aluno excluído com sucesso!", icon="🗑️")
                                     st.session_state['confirma_excluir_id'] = None

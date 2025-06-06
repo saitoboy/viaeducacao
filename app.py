@@ -15,8 +15,6 @@ from utils.carteirinha import aba_carteirinha
 
 load_dotenv()  # Carrega as variáveis do .env
 
-API_URL = os.getenv("API_URL", "http://localhost:8000")
-
 def get_connection():
     return psycopg2.connect(
         host=os.getenv("DB_HOST"),
@@ -38,7 +36,7 @@ import requests
 
 def get_options_api(endpoint):
     try:
-        response = requests.get(f"{API_URL}/{endpoint}/")
+        response = requests.get(f"http://localhost:8000/{endpoint}/")
         if response.status_code == 200:
             return ["Selecione..."] + response.json()
         else:
@@ -64,7 +62,7 @@ def login_page():
         if st.button("Entrar"):
             try:
                 resp = requests.post(
-                    f"{API_URL}/login/",
+                    "http://localhost:8000/login/",
                     json={"email": usuario, "senha": senha}
                 )
                 if resp.status_code == 200:
